@@ -1,0 +1,12 @@
+rm serout.txt
+rm vectout.txt
+rm ompout.txt
+./mmult_omp_timing a2.txt b2.txt
+./mmult_omp_timing a4.txt b4.txt
+./mmult_omp_timing a6.txt b6.txt
+./mmult_omp_timing a8.txt b8.txt
+./mmult_omp_timing a1000.txt b1000.txt
+./mmult_omp_timing a1500.txt b1500.txt
+./mmult_omp_timing a2000.txt b2000.txt
+./mmult_omp_timing a25.txt b25.txt
+gnuplot graph.gnu 

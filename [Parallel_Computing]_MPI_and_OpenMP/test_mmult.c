@@ -16,7 +16,7 @@ int test_unoptimized(double *a, int arows, int acols,
     return are_same;
 }
 
-int main(void) {
+int main(int argc, char *argv[]) {
 
     FILE *out;
     out = fopen("output.txt", "a+");
@@ -35,7 +35,7 @@ int main(void) {
     time_res = ((double)time_end - (double)time_start) / (double)(CLOCKS_PER_SEC);
     fprintf(out,"%d %.5f", 100, time_res);
 
-    time_start =  clock(); mmult_vectorized(c1, a1, 100, 100, b1, 100, 100); time_end = clock();
+    time_start =  clock(); mmult_simd(c1, a1, 100, 100, b1, 100, 100); time_end = clock();
     time_res = ((double)time_end - (double)time_start) / (double)(CLOCKS_PER_SEC);
     fprintf(out," %.5f", time_res);
 
@@ -53,7 +53,7 @@ int main(void) {
     //     time_res = ((double)time_end - (double)time_start) / (double)(CLOCKS_PER_SEC);
     //     fprintf(out,"%d %.5f", arr[i], time_res);
 
-    //     time_start =  clock(); mmult_vectorized(c1, a1, arr[i], arr[i], b1, arr[i], arr[i]); time_end = clock();
+    //     time_start =  clock(); mmult_simd(c1, a1, arr[i], arr[i], b1, arr[i], arr[i]); time_end = clock();
     //     time_res = ((double)time_end - (double)time_start) / (double)(CLOCKS_PER_SEC);
     //     fprintf(out," %.5f", time_res);
 
@@ -76,7 +76,7 @@ int main(void) {
     time_res = ((double)time_end - (double)time_start) / (double)(CLOCKS_PER_SEC);
     fprintf(out,"%d %.5f", 200, time_res);
 
-    time_start =  clock(); mmult_vectorized(c2, a2, 200, 200, b2, 200, 200); time_end = clock();
+    time_start =  clock(); mmult_simd(c2, a2, 200, 200, b2, 200, 200); time_end = clock();
     time_res = ((double)time_end - (double)time_start) / (double)(CLOCKS_PER_SEC);
     fprintf(out," %.5f", time_res);
 
@@ -104,7 +104,7 @@ int main(void) {
     time_res = ((double)time_end - (double)time_start) / (double)(CLOCKS_PER_SEC);
     fprintf(out,"%d %.5f", 500, time_res);
 
-    time_start =  clock(); mmult_vectorized(c5, a5, 500, 500, b5, 500, 500); time_end = clock();
+    time_start =  clock(); mmult_simd(c5, a5, 500, 500, b5, 500, 500); time_end = clock();
     time_res = ((double)time_end - (double)time_start) / (double)(CLOCKS_PER_SEC);
     fprintf(out," %.5f", time_res);
 
@@ -126,7 +126,7 @@ int main(void) {
     time_res = ((double)time_end - (double)time_start) / (double)(CLOCKS_PER_SEC);
     fprintf(out,"%d %.5f", 700, time_res);
 
-    time_start =  clock(); mmult_vectorized(c7, a7, 700, 700, b7, 700, 700); time_end = clock();
+    time_start =  clock(); mmult_simd(c7, a7, 700, 700, b7, 700, 700); time_end = clock();
     time_res = ((double)time_end - (double)time_start) / (double)(CLOCKS_PER_SEC);
     fprintf(out," %.5f", time_res);
 
@@ -155,7 +155,7 @@ int main(void) {
     time_res = ((double)time_end - (double)time_start) / (double)(CLOCKS_PER_SEC);
     fprintf(out,"%d %.5f", 1000, time_res);
 
-    time_start =  clock(); mmult_vectorized(c1000, a1000, 1000, 1000, b1000, 1000, 1000); time_end = clock();
+    time_start =  clock(); mmult_simd(c1000, a1000, 1000, 1000, b1000, 1000, 1000); time_end = clock();
     time_res = ((double)time_end - (double)time_start) / (double)(CLOCKS_PER_SEC);
     fprintf(out," %.5f", time_res);
 
@@ -189,7 +189,7 @@ int main(void) {
     time_res = ((double)time_end - (double)time_start) / (double)(CLOCKS_PER_SEC);
     fprintf(out,"%d %.5f", 3000, time_res);
 
-    time_start =  clock(); mmult_vectorized(c3000, a3000, 3000, 3000, b3000, 3000, 3000); time_end = clock();
+    time_start =  clock(); mmult_simd(c3000, a3000, 3000, 3000, b3000, 3000, 3000); time_end = clock();
     time_res = ((double)time_end - (double)time_start) / (double)(CLOCKS_PER_SEC);
     fprintf(out," %.5f", time_res);
 

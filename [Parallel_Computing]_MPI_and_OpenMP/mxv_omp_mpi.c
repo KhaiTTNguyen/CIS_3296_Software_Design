@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
     if (argc > 1) {
         nrows = atoi(argv[1]);
         ncols = nrows;
-        // aa = (double*)malloc(sizeof(double) * nrows * ncols);
+        aa = (double*)malloc(sizeof(double) * nrows * ncols);
         b = (double*)malloc(sizeof(double) * ncols);
         c = (double*)malloc(sizeof(double) * nrows);
         buffer = (double*)malloc(sizeof(double) * ncols);
@@ -44,28 +44,33 @@ int main(int argc, char* argv[])
             aa = gen_matrix(nrows, ncols);
             starttime = MPI_Wtime();
             numsent = 0;
+            /* ---- broadcast out b for "ncols" time to slave processes -----*/
             MPI_Bcast(b, ncols, MPI_DOUBLE, master, MPI_COMM_WORLD);
             for (i = 0; i < min(numprocs-1, nrows); i++) {
 	            for (j = 0; j < ncols; j++) {
                     buffer[j] = aa[i * ncols + j];
                 }  
-                MPI_Send(buffer, ncols, MPI_DOUBLE, i+1, i+1, MPI_COMM_WORLD);
+                MPI_Send(buffer, ncols, MPI_DOUBLE, i+1, i+1, MPI_COMM_WORLD); // sending collums of "aa" out (till hit numprocs or nros depending on which one is smaller - condition of for-loop)
                 numsent++;
             }
+            /*------receiving back results------*/ 
             for (i = 0; i < nrows; i++) {
                 MPI_Recv(&ans, 1, MPI_DOUBLE, MPI_ANY_SOURCE, MPI_ANY_TAG, 
-                    MPI_COMM_WORLD, &status);
+                    MPI_COMM_WORLD, &status); // receive ans to build matrix "c", from any slave process
                 sender = status.MPI_SOURCE;
-                anstype = status.MPI_TAG;
-                c[anstype-1] = ans;
+                anstype = status.MPI_TAG;     // take tag or index of c
+                c[anstype-1] = ans;           // remember like in SIMD, data is stored in 1D array on hardware
+                // got that &ans back, now send more rows of [aa] to that "sender" worker process 
                 if (numsent < nrows) {
+                    // prep a row to send - buffer
                     for (j = 0; j < ncols; j++) {
                         buffer[j] = aa[numsent*ncols + j];
-                    }  
+                    }
                     MPI_Send(buffer, ncols, MPI_DOUBLE, sender, numsent+1, 
-                        MPI_COMM_WORLD);
+                        MPI_COMM_WORLD); // send the buffer, if you read the MPI docs, {"buffer" is address of send buffer, ncols is number of elements to be sent} 
                     numsent++;
                 } else {
+                    // notify slave process that master is done, MPI_BOTTOM indicate the bottom of the address space
                     MPI_Send(MPI_BOTTOM, 0, MPI_DOUBLE, sender, 0, MPI_COMM_WORLD);
                 }
             } 
@@ -73,6 +78,16 @@ int main(int argc, char* argv[])
             printf("%f\n",(endtime - starttime));
         } else {
             // Slave Code goes here
+            /**
+             * Although the root process and receiver processes do different jobs, 
+             * they all call the same MPI_Bcast function. 
+             * When the root process (in our example, it was process zero) calls MPI_Bcast, 
+             * the "b" vector will be sent to all worker processes. 
+             * When all of the receiver processes call MPI_Bcast, "b" variable will be filled in with the data from the master process.
+             * 
+             * Explaination source:
+             * https://mpitutorial.com/tutorials/mpi-broadcast-and-collective-communication/
+             */
             MPI_Bcast(b, ncols, MPI_DOUBLE, master, MPI_COMM_WORLD);
             if (myid <= nrows) {
 	            while(1) {

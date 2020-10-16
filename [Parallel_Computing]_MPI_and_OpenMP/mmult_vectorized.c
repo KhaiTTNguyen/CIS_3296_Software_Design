@@ -28,19 +28,22 @@ https://azuredevopslabs.com/labs/azuredevops/github/#exercise-2-saving-work-with
  * @param bCols : the number of columns in b.
  * @return 0 if the matrix multiplication is successful.
  */
-int mmult_vectorized(double *c, double *a, int aRows, int aCols, 
+
+// This is using simd, vectorize with -O3 when compile
+int mmult_simd(double *c, double *a, int aRows, int aCols, 
 	      double *b, int bRows, int bCols) {
 
     if(aCols != bRows) {
         return -1;
     }
     
-    for (int i = 0; i < aRows; i++) {  
-        for (int j = 0; j < bCols; j++)  {  
-            c[i*aCols + j] = 0;  
-        }for (int k = 0; k < bRows; k++)  {  
-            for (int l = 0; l < bCols; l++) {     
-                c[i*aCols + l] += a[i*aCols + k] * b[k*bCols + l];
+     for(int i = 0; i < aRows; ++i) {
+        for(int j = 0; j < bCols; ++j) 
+            c[i * bCols + j] = 0;
+
+	for(int k = 0; k < aRows; ++k){
+            for(int l = 0; l < bCols; ++l) {
+                c[i * bCols + l] += a[i * aRows + k] * b[k * bCols + l];
             }
         }
     }
